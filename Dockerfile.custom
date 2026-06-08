@@ -1,0 +1,21 @@
+# Sub2API Custom Build (Key2API)
+FROM alpine:3.21
+
+RUN apk add --no-cache ca-certificates tzdata su-exec libpq zstd-libs lz4-libs krb5-libs libldap libedit && rm -rf /var/cache/apk/*
+
+WORKDIR /app
+RUN addgroup -g 1000 sub2api && adduser -u 1000 -G sub2api -s /bin/sh -D sub2api
+
+COPY backend/bin/server /app/sub2api
+COPY backend/resources /app/resources
+
+RUN mkdir -p /app/data && chown sub2api:sub2api /app/data
+COPY deploy/docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
+
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD wget -q -T 5 -O /dev/null http://localhost:${SERVER_PORT:-8080}/health || exit 1
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["/app/sub2api"]

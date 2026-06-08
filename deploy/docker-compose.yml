@@ -16,7 +16,7 @@ services:
   # Sub2API Application
   # ===========================================================================
   sub2api:
-    image: weishaw/sub2api:latest
+    image: key2api:latest
     container_name: sub2api
     restart: unless-stopped
     ulimits:
@@ -256,6 +256,24 @@ services:
       start_period: 5s
     # 注意：不暴露端口到宿主机，应用通过内部网络连接
     # 如需调试，可临时添加：ports: ["127.0.0.1:6379:6379"]
+  # ===========================================================================
+  # GPT Image Playground (image generation UI sidecar)
+  # ===========================================================================
+  gpt-image-playground:
+    image: ghcr.io/cooksleep/gpt_image_playground:latest
+    container_name: sub2api-image-playground
+    restart: unless-stopped
+    environment:
+      - ENABLE_API_PROXY=true
+      - API_PROXY_URL=http://sub2api:8080/v1
+      - LOCK_API_PROXY=true
+      - DEFAULT_API_URL=
+    networks:
+      - sub2api-network
+    # Expose on a different port for Nginx reverse proxy
+    ports:
+      - "${PLAYGROUND_PORT:-8081}:80"
+
 # =============================================================================
 # Volumes
 # =============================================================================

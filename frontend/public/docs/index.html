@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key2API 使用文档</title>
+    <link rel="icon" href="/logo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.8;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #1a237e, #0d47a1); color: white; padding: 30px 0; text-align: center; }
+        .header h1 { font-size: 28px; margin-bottom: 5px; }
+        .header p { opacity: 0.8; font-size: 14px; }
+        .content { background: white; border-radius: 8px; padding: 40px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .content h2 { font-size: 22px; margin: 30px 0 15px; padding-bottom: 8px; border-bottom: 2px solid #e8eaf6; color: #1a237e; }
+        .content h3 { font-size: 17px; margin: 20px 0 10px; color: #283593; }
+        .content p, .content li { font-size: 15px; margin: 8px 0; color: #444; }
+        .content code { background: #f5f2f0; padding: 2px 6px; border-radius: 3px; font-size: 13px; color: #e53935; }
+        .content pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 12px 0; font-size: 13px; line-height: 1.6; }
+        .content pre code { background: none; color: inherit; padding: 0; }
+        .content table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+        .content th, .content td { border: 1px solid #e0e0e0; padding: 10px 14px; text-align: left; font-size: 14px; }
+        .content th { background: #f5f5f5; font-weight: 600; }
+        .content tr:nth-child(even) { background: #fafafa; }
+        .content blockquote { border-left: 4px solid #1a237e; padding: 10px 16px; margin: 12px 0; background: #f5f7ff; border-radius: 0 4px 4px 0; }
+        .content blockquote p { margin: 0; }
+        .content ul, .content ol { padding-left: 24px; }
+        .footer { text-align: center; padding: 20px; color: #999; font-size: 13px; }
+        @media (max-width: 640px) { .content { padding: 20px; } .header h1 { font-size: 22px; } }
+    </style>
+</head>
+<body>
+    <div class="header"><div class="container"><h1>📖 Key2API 使用文档</h1><p>AI API 中转服务平台 - 使用指南</p></div></div>
+    <div class="container"><div class="content"><h1>Key2API 使用文档</h1>
+<h2>📋 基本信息</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>API 地址</strong></td>
+<td style="text-align: left;"><code>https://key2api.com</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>计费模式</strong></td>
+<td style="text-align: left;">预充值余额扣费</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>倍率说明</strong></td>
+<td style="text-align: left;">所有模型按照官方 USD 价格 × <strong>10</strong> 计费，以人民币结算</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>新用户赠送</strong></td>
+<td style="text-align: left;">注册即送 <strong>¥1</strong> 体验金</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>🚀 快速开始</h2>
+<h3>第一步：注册账号</h3>
+<ol>
+<li>访问 <a href="https://key2api.com">https://key2api.com</a> 注册账号</li>
+<li>验证邮箱后登录</li>
+</ol>
+<h3>第二步：充值</h3>
+<ol>
+<li>登录后点击左侧菜单 <strong>充值</strong></li>
+<li>选择金额，使用支付宝扫码付款</li>
+<li>充值成功后余额自动到账</li>
+</ol>
+<h3>第三步：创建 API Key</h3>
+<ol>
+<li>点击左侧菜单 <strong>API 密钥</strong></li>
+<li>点击 <strong>创建密钥</strong></li>
+<li>复制密钥并保存（关闭后不再显示完整密钥）</li>
+</ol>
+<h3>第四步：调用 API</h3>
+<p>Key2API 兼容 <strong>OpenAI、Claude、Gemini</strong> 的接口格式，可直接替换使用。</p>
+<hr />
+<h2>💻 调用示例</h2>
+<h3>OpenAI 兼容接口</h3>
+<div class="codehilite"><pre><span></span><code>curl<span class="w"> </span>https://key2api.com/v1/chat/completions<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer sk-你的密钥&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;model&quot;: &quot;gpt-4o&quot;,</span>
+<span class="s1">    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你好&quot;}]</span>
+<span class="s1">  }&#39;</span>
+</code></pre></div>
+
+<h3>Python</h3>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span>
+    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;sk-你的密钥&quot;</span><span class="p">,</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;https://key2api.com&quot;</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;你好&quot;</span><span class="p">}]</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</code></pre></div>
+
+<h3>JavaScript / Node.js</h3>
+<div class="codehilite"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">OpenAI</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;openai&#39;</span><span class="p">;</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">OpenAI</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">apiKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;sk-你的密钥&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">baseURL</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://key2api.com&#39;</span>
+<span class="p">});</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">chat</span><span class="p">.</span><span class="nx">completions</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+<span class="w">  </span><span class="nx">model</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
+<span class="w">  </span><span class="nx">messages</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">role</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;user&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;你好&#39;</span><span class="w"> </span><span class="p">}]</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">choices</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">message</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
+</code></pre></div>
+
+<h3>Claude API</h3>
+<div class="codehilite"><pre><span></span><code>curl<span class="w"> </span>https://key2api.com/v1/messages<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;x-api-key: sk-你的密钥&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;model&quot;: &quot;claude-sonnet-4-20250514&quot;,</span>
+<span class="s1">    &quot;max_tokens&quot;: 1024,</span>
+<span class="s1">    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你好&quot;}]</span>
+<span class="s1">  }&#39;</span>
+</code></pre></div>
+
+<h3>Gemini API</h3>
+<div class="codehilite"><pre><span></span><code>curl<span class="w"> </span>https://key2api.com/v1/models/gemini-2.5-pro:generateContent<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;x-goog-api-key: sk-你的密钥&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;contents&quot;: [{&quot;parts&quot;:[{&quot;text&quot;: &quot;你好&quot;}]}]</span>
+<span class="s1">  }&#39;</span>
+</code></pre></div>
+
+<hr />
+<h2>📊 定价说明</h2>
+<p>所有模型按 <strong>Token 用量</strong> 计费，价格 = 官方 USD 价格 × 倍率 <strong>10</strong>，按人民币结算。</p>
+<h3>常见模型价格参考</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">模型</th>
+<th style="text-align: center;">输入价格 (¥/1M token)</th>
+<th style="text-align: center;">输出价格 (¥/1M token)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">GPT-4o</td>
+<td style="text-align: center;">¥30</td>
+<td style="text-align: center;">¥150</td>
+</tr>
+<tr>
+<td style="text-align: left;">GPT-4o-mini</td>
+<td style="text-align: center;">¥2</td>
+<td style="text-align: center;">¥8</td>
+</tr>
+<tr>
+<td style="text-align: left;">Claude Sonnet 4</td>
+<td style="text-align: center;">¥30</td>
+<td style="text-align: center;">¥150</td>
+</tr>
+<tr>
+<td style="text-align: left;">Claude Haiku 3.5</td>
+<td style="text-align: center;">¥8</td>
+<td style="text-align: center;">¥40</td>
+</tr>
+<tr>
+<td style="text-align: left;">Gemini 2.5 Pro</td>
+<td style="text-align: center;">¥15</td>
+<td style="text-align: center;">¥75</td>
+</tr>
+<tr>
+<td style="text-align: left;">DeepSeek V3</td>
+<td style="text-align: center;">¥3</td>
+<td style="text-align: center;">¥15</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>实际价格以页面显示为准，以上为参考值。</p>
+</blockquote>
+<hr />
+<h2>🔧 常用功能</h2>
+<h3>查看用量</h3>
+<p>左侧菜单 <strong>用量统计</strong> → 可查看每日/每模型的详细用量和扣费明细。</p>
+<h3>查看订单</h3>
+<p>左侧菜单 <strong>订单记录</strong> → 查看充值记录和退款申请。</p>
+<h3>可用渠道</h3>
+<p>左侧菜单 <strong>可用渠道</strong> → 查看你所有可用的模型和定价信息（鼠标悬停模型名查看详情）。</p>
+<hr />
+<h2>❓ 常见问题</h2>
+<h3>Q: 为什么余额显示 ¥0.5，但扣费显示 $0.5？</h3>
+<p><strong>A:</strong> 前端显示 <code>$</code> 符号，实际扣的是你的人民币余额，1:1 对应。<code>$0.5</code> = 扣余额 ¥0.5。</p>
+<h3>Q: 支持哪些模型？</h3>
+<p><strong>A:</strong> 登录后点击 <strong>可用渠道</strong> 查看全部支持的模型列表，持续更新中。</p>
+<h3>Q: API Key 丢了怎么办？</h3>
+<p><strong>A:</strong> 在 <strong>API 密钥</strong> 页面删除旧密钥，重新创建新密钥即可。</p>
+<h3>Q: 如何申请退款？</h3>
+<p><strong>A:</strong> 在 <strong>订单记录</strong> 中找到已支付订单，点击 <strong>申请退款</strong> 并填写原因，管理员审核后处理。</p>
+<h3>Q: 余额不足怎么办？</h3>
+<p><strong>A:</strong> 余额低于 ¥10 时系统会发送邮件提醒，请及时充值以免服务中断。</p>
+<h3>Q: 充值后多久到账？</h3>
+<p><strong>A:</strong> 支付宝扫码支付成功后，通常 <strong>几秒钟内</strong> 自动到账。如果长时间未到账，请联系客服。</p>
+<hr />
+<h2>📞 联系我们</h2>
+<ul>
+<li><strong>邮箱</strong>: key2api@163.com</li>
+</ul>
+<hr />
+<p><em>文档版本: v1.0 · 最后更新: 2026-06-04</em></p></div><div class="footer"><p>Key2API &copy; 2026 · 如有问题请联系 key2api@163.com</p></div></div>
+</body>
+</html>

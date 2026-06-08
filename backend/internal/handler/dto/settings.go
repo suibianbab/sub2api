@@ -316,6 +316,9 @@ type PublicSettings struct {
 	AffiliateEnabled bool `json:"affiliate_enabled"`
 
 	RiskControlEnabled bool `json:"risk_control_enabled"`
+
+	ImagePlaygroundEnabled bool   `json:"image_playground_enabled"`
+	ImagePlaygroundURL     string `json:"image_playground_url"`
 }
 
 type LoginAgreementDocument struct {

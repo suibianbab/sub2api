@@ -293,6 +293,10 @@ type PublicSettings struct {
 
 	// 风控中心功能开关
 	RiskControlEnabled bool `json:"risk_control_enabled"`
+
+	// Image Playground feature
+	ImagePlaygroundEnabled bool   `json:"image_playground_enabled"`
+	ImagePlaygroundURL     string `json:"image_playground_url"`
 }
 
 type LoginAgreementDocument struct {

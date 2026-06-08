@@ -108,6 +108,17 @@ onMounted(async () => {
 
   // Re-resolve document title now that siteName is available
   document.title = resolveDocumentTitle(route.meta.title, appStore.siteName, route.meta.titleKey as string)
+
+  // 动态加载 Tawk.to 客服（放在 Vue mount 之后，避免 SPA 路由切换时被清除）
+  try {
+    if (!document.querySelector('script[src*="tawk.to"]')) {
+      const s = document.createElement('script')
+      s.src = '/tawk.js'
+      document.body.appendChild(s)
+    }
+  } catch {
+    // ignore
+  }
 })
 </script>
 

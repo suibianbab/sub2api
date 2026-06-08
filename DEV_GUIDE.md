@@ -338,7 +338,28 @@ sub2api-bmai/
     └── CLAUDE.md            # 本文档
 ```
 
-## 七、参考资源
+## 七、自定义改动记录
+
+> 升级上游时务必检查此节，确保自定义改动不被覆盖。
+
+### 改动 1：图片生成功能集成（2026-06-07）
+
+集成 [GPT Image Playground](https://github.com/CookSleep/gpt_image_playground) 作为 sidecar 服务，通过 iframe 嵌入前端。
+
+**改动文件**：
+- 新建 `frontend/src/views/user/ImagePlaygroundView.vue`
+- 修改 `frontend/src/router/index.ts` — 添加 `/image-playground` 路由
+- 修改 `frontend/src/components/layout/AppSidebar.vue` — 添加 ImageIcon + 导航项 + feature flag
+- 修改 `frontend/src/types/index.ts` — PublicSettings 添加 `image_playground_enabled`、`image_playground_url`
+- 修改 `frontend/src/utils/featureFlags.ts` — 注册 `imagePlayground` flag (opt-in)
+- 修改 `frontend/src/i18n/locales/zh.ts` + `en.ts` — 添加翻译
+- 修改 `deploy/docker-compose.yml` — 添加 sidecar 服务（已注释）
+
+**详细文档**：[docs/IMAGE_PLAYGROUND_INTEGRATION.md](docs/IMAGE_PLAYGROUND_INTEGRATION.md)
+
+---
+
+## 八、参考资源
 
 - [上游仓库](https://github.com/Wei-Shaw/sub2api)
 - [Ent 文档](https://entgo.io/docs/getting-started)

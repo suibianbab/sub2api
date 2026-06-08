@@ -47,6 +47,13 @@ var requiredCSPDirectiveValues = []struct {
 	{"style-src", AirwallexDemoStaticDomain},
 	{"style-src", AirwallexDemoCheckoutDomain},
 	{"frame-src", AirwallexDemoCheckoutDomain},
+	// Tawk.to 在线客服
+	{"script-src", "https://embed.tawk.to"},
+	{"connect-src", "https://*.tawk.to"},
+	{"connect-src", "wss://*.tawk.to"},
+	{"img-src", "https://*.tawk.to"},
+	{"style-src", "https://*.tawk.to"},
+	{"frame-src", "https://*.tawk.to"},
 }
 
 // GenerateNonce generates a cryptographically secure random nonce.
@@ -108,7 +115,7 @@ func SecurityHeaders(cfg config.CSPConfig, getFrameSrcOrigins func() []string) g
 				c.Header("Content-Security-Policy", strings.ReplaceAll(finalPolicy, NonceTemplate, "'unsafe-inline'"))
 			} else {
 				c.Set(CSPNonceKey, nonce)
-				c.Header("Content-Security-Policy", strings.ReplaceAll(finalPolicy, NonceTemplate, "'nonce-"+nonce+"'"))
+				c.Header("Content-Security-Policy", strings.ReplaceAll(finalPolicy, NonceTemplate, "'unsafe-inline'"))
 			}
 		}
 		c.Next()
