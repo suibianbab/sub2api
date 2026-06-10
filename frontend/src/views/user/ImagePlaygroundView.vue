@@ -94,7 +94,7 @@
                     :platform="(option as any).platform"
                     :subscription-type="(option as any).subscriptionType"
                     :rate-multiplier="(option as any).rate"
-                    :show-rate="true"
+                    :show-rate="false"
                   />
                 </template>
                 <template #option="{ option, selected }">
@@ -105,6 +105,7 @@
                     :rate-multiplier="(option as any).rate"
                     :description="(option as any).description"
                     :selected="selected"
+                    :show-rate="false"
                   />
                 </template>
               </Select>
@@ -210,18 +211,11 @@ const playgroundUrl = computed(() => {
 
 /**
  * The Sub2API API base URL for the Playground to call.
- * Uses apiBaseUrl from public settings.
+ * Uses the direct API endpoint (api.keys2api.com) to bypass Cloudflare
+ * and avoid timeouts for long-running 2K image generation requests.
  */
 const apiBaseUrl = computed(() => {
-  const base = appStore.apiBaseUrl
-  if (base) {
-    // Ensure URL ends with /v1 (Playground requires the full API base URL)
-    return base.endsWith('/v1') ? base : `${base}/v1`
-  }
-  // Fallback: construct from current window location
-  const { protocol, hostname, port } = window.location
-  const portPart = port ? `:${port}` : ''
-  return `${protocol}//${hostname}${portPart}/v1`
+  return 'https://api.keys2api.com/v1'
 })
 
 /**

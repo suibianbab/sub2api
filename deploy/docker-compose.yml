@@ -266,7 +266,7 @@ services:
     environment:
       - ENABLE_API_PROXY=true
       - API_PROXY_URL=http://sub2api:8080/v1
-      - LOCK_API_PROXY=true
+      - LOCK_API_PROXY=false
       - DEFAULT_API_URL=
     networks:
       - sub2api-network
