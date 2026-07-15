@@ -150,6 +150,8 @@ export default {
     dashboard: '仪表盘',
     announcements: '公告',
     apiKeys: 'API 密钥',
+    imagePlayground: '图片生成',
+    pricing: '模型定价',
     batchImage: '批量生图',
     usage: '使用记录',
     redeem: '兑换',

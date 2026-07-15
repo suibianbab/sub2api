@@ -223,6 +223,8 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		SettingKeyAffiliateEnabled,
 		SettingKeyRiskControlEnabled,
 		SettingKeyAllowUserViewErrorRequests,
+		SettingKeyImagePlaygroundEnabled,
+		SettingKeyImagePlaygroundURL,
 	}
 
 	settings, err := s.settingRepo.GetMultiple(ctx, keys)
@@ -296,7 +298,7 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		LoginAgreementDocuments:          loginAgreementDocuments,
 		TurnstileEnabled:                 settings[SettingKeyTurnstileEnabled] == "true",
 		TurnstileSiteKey:                 settings[SettingKeyTurnstileSiteKey],
-		SiteName:                         s.getStringOrDefault(settings, SettingKeySiteName, "Sub2API"),
+		SiteName:                         s.getStringOrDefault(settings, SettingKeySiteName, "Key2API"),
 		SiteLogo:                         settings[SettingKeySiteLogo],
 		SiteSubtitle:                     s.getStringOrDefault(settings, SettingKeySiteSubtitle, "Subscription to API Conversion Platform"),
 		APIBaseURL:                       settings[SettingKeyAPIBaseURL],
@@ -337,6 +339,9 @@ func (s *SettingService) GetPublicSettings(ctx context.Context) (*PublicSettings
 		RiskControlEnabled: settings[SettingKeyRiskControlEnabled] == "true",
 
 		AllowUserViewErrorRequests: settings[SettingKeyAllowUserViewErrorRequests] == "true",
+
+		ImagePlaygroundEnabled: settings[SettingKeyImagePlaygroundEnabled] == "true",
+		ImagePlaygroundURL:     strings.TrimSpace(settings[SettingKeyImagePlaygroundURL]),
 	}, nil
 }
 
@@ -497,6 +502,10 @@ type PublicSettingsInjectionPayload struct {
 	AffiliateEnabled                     bool `json:"affiliate_enabled"`
 	RiskControlEnabled                   bool `json:"risk_control_enabled"`
 	AllowUserViewErrorRequests           bool `json:"allow_user_view_error_requests"`
+
+	// Image Playground feature (Key2API custom)
+	ImagePlaygroundEnabled bool   `json:"image_playground_enabled"`
+	ImagePlaygroundURL     string `json:"image_playground_url"`
 }
 
 // GetPublicSettingsForInjection returns public settings in a format suitable for HTML injection.
@@ -562,6 +571,9 @@ func (s *SettingService) GetPublicSettingsForInjection(ctx context.Context) (any
 		AffiliateEnabled:                     settings.AffiliateEnabled,
 		RiskControlEnabled:                   settings.RiskControlEnabled,
 		AllowUserViewErrorRequests:           settings.AllowUserViewErrorRequests,
+
+		ImagePlaygroundEnabled: settings.ImagePlaygroundEnabled,
+		ImagePlaygroundURL:     settings.ImagePlaygroundURL,
 	}, nil
 }
 

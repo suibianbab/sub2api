@@ -150,6 +150,8 @@ export default {
     dashboard: 'Dashboard',
     announcements: 'Announcements',
     apiKeys: 'API Keys',
+    imagePlayground: 'Image Playground',
+    pricing: 'Model Pricing',
     batchImage: 'Batch Images',
     usage: 'Usage',
     redeem: 'Redeem',

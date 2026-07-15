@@ -102,8 +102,8 @@ func (h *SettingHandler) GetPublicSettings(c *gin.Context) {
 
 		RiskControlEnabled: settings.RiskControlEnabled,
 
-		ImagePlaygroundEnabled: settings.ImagePlaygroundEnabled,
-		ImagePlaygroundURL:     settings.ImagePlaygroundURL,
+		ImagePlaygroundEnabled:     settings.ImagePlaygroundEnabled,
+		ImagePlaygroundURL:         settings.ImagePlaygroundURL,
 		AllowUserViewErrorRequests: settings.AllowUserViewErrorRequests,
 	})
 }

@@ -362,9 +362,9 @@ type PublicSettings struct {
 
 	RiskControlEnabled bool `json:"risk_control_enabled"`
 
-	ImagePlaygroundEnabled bool   `json:"image_playground_enabled"`
-	ImagePlaygroundURL     string `json:"image_playground_url"`
-	AllowUserViewErrorRequests bool `json:"allow_user_view_error_requests"`
+	ImagePlaygroundEnabled     bool   `json:"image_playground_enabled"`
+	ImagePlaygroundURL         string `json:"image_playground_url"`
+	AllowUserViewErrorRequests bool   `json:"allow_user_view_error_requests"`
 }
 
 type LoginAgreementDocument struct {
