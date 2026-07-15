@@ -389,6 +389,7 @@ export default {
     channelStatus: '渠道状态',
     riskControl: '风控中心',
     imagePlayground: '图片生成',
+    pricing: '模型定价',
   },
 
   // Auth
@@ -1052,6 +1053,17 @@ export default {
       unitPerMillion: '/ 1M token',
       unitPerRequest: '/ 次'
     }
+  },
+
+  pricing: {
+    title: '模型定价',
+    description: '所有模型的 USD 官方价格参考（$/1M tokens）',
+    searchPlaceholder: '搜索模型名称...',
+    allPlatforms: '全部',
+    empty: '暂无可用模型',
+    input: '输入',
+    output: '输出',
+    totalModels: '共 {count} 个模型',
   },
 
   affiliate: {

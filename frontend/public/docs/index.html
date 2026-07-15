@@ -1,230 +1,964 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Key2API 使用文档</title>
-    <link rel="icon" href="/logo.png">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-            line-height: 1.8;
-        }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #1a237e, #0d47a1); color: white; padding: 30px 0; text-align: center; }
-        .header h1 { font-size: 28px; margin-bottom: 5px; }
-        .header p { opacity: 0.8; font-size: 14px; }
-        .content { background: white; border-radius: 8px; padding: 40px; margin: 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .content h2 { font-size: 22px; margin: 30px 0 15px; padding-bottom: 8px; border-bottom: 2px solid #e8eaf6; color: #1a237e; }
-        .content h3 { font-size: 17px; margin: 20px 0 10px; color: #283593; }
-        .content p, .content li { font-size: 15px; margin: 8px 0; color: #444; }
-        .content code { background: #f5f2f0; padding: 2px 6px; border-radius: 3px; font-size: 13px; color: #e53935; }
-        .content pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 12px 0; font-size: 13px; line-height: 1.6; }
-        .content pre code { background: none; color: inherit; padding: 0; }
-        .content table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-        .content th, .content td { border: 1px solid #e0e0e0; padding: 10px 14px; text-align: left; font-size: 14px; }
-        .content th { background: #f5f5f5; font-weight: 600; }
-        .content tr:nth-child(even) { background: #fafafa; }
-        .content blockquote { border-left: 4px solid #1a237e; padding: 10px 16px; margin: 12px 0; background: #f5f7ff; border-radius: 0 4px 4px 0; }
-        .content blockquote p { margin: 0; }
-        .content ul, .content ol { padding-left: 24px; }
-        .footer { text-align: center; padding: 20px; color: #999; font-size: 13px; }
-        @media (max-width: 640px) { .content { padding: 20px; } .header h1 { font-size: 22px; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keys2API 使用文档</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 </head>
 <body>
-    <div class="header"><div class="container"><h1>📖 Key2API 使用文档</h1><p>AI API 中转服务平台 - 使用指南</p></div></div>
-    <div class="container"><div class="content"><h1>Key2API 使用文档</h1>
-<h2>📋 基本信息</h2>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">项目</th>
-<th style="text-align: left;">内容</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><strong>API 地址</strong></td>
-<td style="text-align: left;"><code>https://key2api.com</code></td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>计费模式</strong></td>
-<td style="text-align: left;">预充值余额扣费</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>倍率说明</strong></td>
-<td style="text-align: left;">所有模型按照官方 USD 价格 × <strong>10</strong> 计费，以人民币结算</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>新用户赠送</strong></td>
-<td style="text-align: left;">注册即送 <strong>¥1</strong> 体验金</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2>🚀 快速开始</h2>
-<h3>第一步：注册账号</h3>
-<ol>
-<li>访问 <a href="https://key2api.com">https://key2api.com</a> 注册账号</li>
-<li>验证邮箱后登录</li>
-</ol>
-<h3>第二步：充值</h3>
-<ol>
-<li>登录后点击左侧菜单 <strong>充值</strong></li>
-<li>选择金额，使用支付宝扫码付款</li>
-<li>充值成功后余额自动到账</li>
-</ol>
-<h3>第三步：创建 API Key</h3>
-<ol>
-<li>点击左侧菜单 <strong>API 密钥</strong></li>
-<li>点击 <strong>创建密钥</strong></li>
-<li>复制密钥并保存（关闭后不再显示完整密钥）</li>
-</ol>
-<h3>第四步：调用 API</h3>
-<p>Key2API 兼容 <strong>OpenAI、Claude、Gemini</strong> 的接口格式，可直接替换使用。</p>
-<hr />
-<h2>💻 调用示例</h2>
-<h3>OpenAI 兼容接口</h3>
-<div class="codehilite"><pre><span></span><code>curl<span class="w"> </span>https://key2api.com/v1/chat/completions<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer sk-你的密钥&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
-<span class="s1">    &quot;model&quot;: &quot;gpt-4o&quot;,</span>
-<span class="s1">    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你好&quot;}]</span>
-<span class="s1">  }&#39;</span>
-</code></pre></div>
 
-<h3>Python</h3>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">openai</span> <span class="kn">import</span> <span class="n">OpenAI</span>
+<!-- Mobile menu toggle -->
+<div class="menu-toggle" id="menuToggle">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
 
-<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span>
-    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;sk-你的密钥&quot;</span><span class="p">,</span>
-    <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;https://key2api.com&quot;</span>
-<span class="p">)</span>
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="#intro" class="logo">Keys2API 文档</a>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <!-- Generated by JS -->
+  </nav>
+</aside>
 
-<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;gpt-4o&quot;</span><span class="p">,</span>
-    <span class="n">messages</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;你好&quot;</span><span class="p">}]</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
-</code></pre></div>
+<!-- Overlay for mobile -->
+<div class="overlay" id="overlay"></div>
 
-<h3>JavaScript / Node.js</h3>
-<div class="codehilite"><pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">OpenAI</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;openai&#39;</span><span class="p">;</span>
+<!-- Main content -->
+<main class="main" id="main">
+  <div class="content">
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">OpenAI</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">apiKey</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;sk-你的密钥&#39;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">baseURL</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;https://key2api.com&#39;</span>
-<span class="p">});</span>
+<!-- ==================== 引言 ==================== -->
+<section id="intro" data-title="引言">
+  <h1>引言</h1>
+  <p class="lead">Keys2API 是一个 AI 模型 API 聚合服务，兼容 OpenAI、Anthropic Claude、Google Gemini 等主流大模型 API 格式，让你可以通过统一的接口访问多种 AI 模型。</p>
 
-<span class="kd">const</span><span class="w"> </span><span class="nx">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">client</span><span class="p">.</span><span class="nx">chat</span><span class="p">.</span><span class="nx">completions</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
-<span class="w">  </span><span class="nx">model</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
-<span class="w">  </span><span class="nx">messages</span><span class="o">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nx">role</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;user&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">content</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;你好&#39;</span><span class="w"> </span><span class="p">}]</span>
-<span class="p">});</span>
+  <h2>核心特性</h2>
+  <ul>
+    <li><strong>统一接口</strong>：支持 OpenAI、Claude、Gemini 三大格式，一个 Key 搞定所有模型</li>
+    <li><strong>丰富模型</strong>：GPT、Claude、Gemini、DeepSeek、Qwen、GLM 等数百种模型</li>
+    <li><strong>图像生成</strong>：支持 DALL·E、GPT Image 等图像生成模型</li>
+    <li><strong>高可用性</strong>：多节点负载均衡，自动故障转移</li>
+    <li><strong>灵活计费</strong>：按 token 计费，支持分组定价</li>
+    <li><strong>实时流式</strong>：全面支持 SSE 流式输出</li>
+    <li><strong>函数调用</strong>：支持 Function Calling 和结构化输出</li>
+    <li><strong>视觉理解</strong>：支持图片识别和图文混合对话</li>
+  </ul>
 
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">choices</span><span class="p">[</span><span class="mf">0</span><span class="p">].</span><span class="nx">message</span><span class="p">.</span><span class="nx">content</span><span class="p">);</span>
-</code></pre></div>
+  <div class="info-tip">
+    <strong>Base URL</strong>
+    <p>所有 API 请求的基础地址为：<code>https://keys2api.com</code></p>
+  </div>
+</section>
 
-<h3>Claude API</h3>
-<div class="codehilite"><pre><span></span><code>curl<span class="w"> </span>https://key2api.com/v1/messages<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;x-api-key: sk-你的密钥&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
-<span class="s1">    &quot;model&quot;: &quot;claude-sonnet-4-20250514&quot;,</span>
-<span class="s1">    &quot;max_tokens&quot;: 1024,</span>
-<span class="s1">    &quot;messages&quot;: [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;你好&quot;}]</span>
-<span class="s1">  }&#39;</span>
-</code></pre></div>
+<!-- ==================== 快速开始 ==================== -->
+<section id="quick-start" data-title="快速开始">
+  <h1>快速开始</h1>
 
-<h3>Gemini API</h3>
-<div class="codehilite"><pre><span></span><code>curl<span class="w"> </span>https://key2api.com/v1/models/gemini-2.5-pro:generateContent<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;x-goog-api-key: sk-你的密钥&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
-<span class="s1">    &quot;contents&quot;: [{&quot;parts&quot;:[{&quot;text&quot;: &quot;你好&quot;}]}]</span>
-<span class="s1">  }&#39;</span>
-</code></pre></div>
+  <h2>1. 注册并获取 API Key</h2>
+  <ol>
+    <li>访问 <a href="https://keys2api.com" target="_blank">Keys2API 控制台</a> 注册账号</li>
+    <li>在「API 密钥」页面创建新的 API Key</li>
+    <li>选择合适的分组（不同分组对应不同的模型和价格）</li>
+    <li>复制生成的 Key（格式：<code>sk-xxxx</code>）</li>
+  </ol>
 
-<hr />
-<h2>📊 定价说明</h2>
-<p>所有模型按 <strong>Token 用量</strong> 计费，价格 = 官方 USD 价格 × 倍率 <strong>10</strong>，按人民币结算。</p>
-<h3>常见模型价格参考</h3>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">模型</th>
-<th style="text-align: center;">输入价格 (¥/1M token)</th>
-<th style="text-align: center;">输出价格 (¥/1M token)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;">GPT-4o</td>
-<td style="text-align: center;">¥30</td>
-<td style="text-align: center;">¥150</td>
-</tr>
-<tr>
-<td style="text-align: left;">GPT-4o-mini</td>
-<td style="text-align: center;">¥2</td>
-<td style="text-align: center;">¥8</td>
-</tr>
-<tr>
-<td style="text-align: left;">Claude Sonnet 4</td>
-<td style="text-align: center;">¥30</td>
-<td style="text-align: center;">¥150</td>
-</tr>
-<tr>
-<td style="text-align: left;">Claude Haiku 3.5</td>
-<td style="text-align: center;">¥8</td>
-<td style="text-align: center;">¥40</td>
-</tr>
-<tr>
-<td style="text-align: left;">Gemini 2.5 Pro</td>
-<td style="text-align: center;">¥15</td>
-<td style="text-align: center;">¥75</td>
-</tr>
-<tr>
-<td style="text-align: left;">DeepSeek V3</td>
-<td style="text-align: center;">¥3</td>
-<td style="text-align: center;">¥15</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>实际价格以页面显示为准，以上为参考值。</p>
-</blockquote>
-<hr />
-<h2>🔧 常用功能</h2>
-<h3>查看用量</h3>
-<p>左侧菜单 <strong>用量统计</strong> → 可查看每日/每模型的详细用量和扣费明细。</p>
-<h3>查看订单</h3>
-<p>左侧菜单 <strong>订单记录</strong> → 查看充值记录和退款申请。</p>
-<h3>可用渠道</h3>
-<p>左侧菜单 <strong>可用渠道</strong> → 查看你所有可用的模型和定价信息（鼠标悬停模型名查看详情）。</p>
-<hr />
-<h2>❓ 常见问题</h2>
-<h3>Q: 为什么余额显示 ¥0.5，但扣费显示 $0.5？</h3>
-<p><strong>A:</strong> 前端显示 <code>$</code> 符号，实际扣的是你的人民币余额，1:1 对应。<code>$0.5</code> = 扣余额 ¥0.5。</p>
-<h3>Q: 支持哪些模型？</h3>
-<p><strong>A:</strong> 登录后点击 <strong>可用渠道</strong> 查看全部支持的模型列表，持续更新中。</p>
-<h3>Q: API Key 丢了怎么办？</h3>
-<p><strong>A:</strong> 在 <strong>API 密钥</strong> 页面删除旧密钥，重新创建新密钥即可。</p>
-<h3>Q: 如何申请退款？</h3>
-<p><strong>A:</strong> 在 <strong>订单记录</strong> 中找到已支付订单，点击 <strong>申请退款</strong> 并填写原因，管理员审核后处理。</p>
-<h3>Q: 余额不足怎么办？</h3>
-<p><strong>A:</strong> 余额低于 ¥10 时系统会发送邮件提醒，请及时充值以免服务中断。</p>
-<h3>Q: 充值后多久到账？</h3>
-<p><strong>A:</strong> 支付宝扫码支付成功后，通常 <strong>几秒钟内</strong> 自动到账。如果长时间未到账，请联系客服。</p>
-<hr />
-<h2>📞 联系我们</h2>
-<ul>
-<li><strong>邮箱</strong>: key2api@163.com</li>
-</ul>
-<hr />
-<p><em>文档版本: v1.0 · 最后更新: 2026-06-04</em></p></div><div class="footer"><p>Key2API &copy; 2026 · 如有问题请联系 key2api@163.com</p></div></div>
+  <h2>2. 发起第一次请求</h2>
+  <p>使用 cURL 发送一个简单的聊天请求：</p>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "你好，介绍一下你自己"}]
+  }'</code></pre>
+
+  <details class="win-curl" open>
+    <summary>Windows 环境下的写法</summary>
+    <div class="win-curl-body">
+      <p class="win-label">PowerShell（推荐）：</p>
+      <pre><code class="language-powershell">$body = @{
+    model = "gpt-4o"
+    messages = @(@{role="user"; content="你好，介绍一下你自己"})
+} | ConvertTo-Json -Depth 5
+
+curl.exe https://keys2api.com/v1/chat/completions `
+  -H "Content-Type: application/json" `
+  -H "Authorization: Bearer sk-你的KEY" `
+  -d $body</code></pre>
+      <p class="win-label">CMD（命令提示符）：</p>
+      <pre><code class="language-cmd">curl https://keys2api.com/v1/chat/completions ^
+  -H "Content-Type: application/json" ^
+  -H "Authorization: Bearer sk-你的KEY" ^
+  -d "{\"model\":\"gpt-4o\",\"messages\":[{\"role\":\"user\",\"content\":\"你好\"}]}"</code></pre>
+      <p class="win-note">提示：PowerShell 中 <code>curl</code> 是 <code>Invoke-WebRequest</code> 的别名，必须使用 <code>curl.exe</code> 调用真正的 curl。</p>
+    </div>
+  </details>
+
+  <h2>3. 使用 Python（OpenAI SDK）</h2>
+  <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-你的KEY",
+    base_url="https://keys2api.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "你好！"}]
+)
+print(response.choices[0].message.content)</code></pre>
+
+  <h2>4. 使用 Node.js</h2>
+  <pre><code class="language-javascript">import OpenAI from "openai";
+
+const client = new OpenAI({
+    apiKey: "sk-你的KEY",
+    baseURL: "https://keys2api.com/v1",
+});
+
+const response = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: "你好！" }],
+});
+console.log(response.choices[0].message.content);</code></pre>
+</section>
+
+<!-- ==================== 平台介绍 ==================== -->
+<section id="about" data-title="平台介绍">
+  <h1>平台介绍</h1>
+
+  <h2 id="about-base-url">调用地址</h2>
+  <table class="info-table">
+    <tr><th>用途</th><th>地址</th></tr>
+    <tr><td>OpenAI 格式 API</td><td><code>https://keys2api.com/v1</code></td></tr>
+    <tr><td>Claude 格式 API</td><td><code>https://keys2api.com</code></td></tr>
+    <tr><td>Gemini 格式 API</td><td><code>https://keys2api.com</code></td></tr>
+    <tr><td>控制台</td><td><code>https://keys2api.com</code></td></tr>
+  </table>
+
+  <h2 id="about-groups">分组说明</h2>
+  <p>Keys2API 通过「分组」机制来区分不同级别的模型和定价。创建密钥时可以选择绑定到特定分组，从而控制该密钥能访问哪些模型及对应价格。</p>
+  <div class="info-tip">
+    <strong>提示</strong>
+    <p>不同分组对应不同的模型列表和价格倍率，请根据你的使用场景选择合适的分组。详情请参考 <a href="../pricing.html">价格页面</a>。</p>
+  </div>
+
+  <h2 id="about-token">密钥（API Key）管理</h2>
+  <ol>
+    <li>登录控制台，进入「密钥」页面</li>
+    <li>点击「添加密钥」，设置名称、选择分组、设置额度</li>
+    <li>创建成功后复制 Key，妥善保存</li>
+    <li>可随时修改额度、重置 Key、或删除密钥</li>
+  </ol>
+</section>
+
+<!-- ==================== OpenAI Chat API ==================== -->
+<section id="chat-openai" data-title="OpenAI Chat API">
+  <h1>OpenAI Chat API</h1>
+  <p>兼容 OpenAI Chat Completions API 格式，支持所有 OpenAI 模型及以 OpenAI 格式接入的其他模型。</p>
+
+  <h2 id="chat-basic">基础对话（非流式）</h2>
+  <div class="endpoint"><span class="method post">POST</span> <code>/v1/chat/completions</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [
+      {"role": "system", "content": "你是一个有帮助的助手。"},
+      {"role": "user", "content": "什么是量子计算？"}
+    ]
+  }'</code></pre>
+
+  <p>响应示例：</p>
+  <pre><code class="language-json">{
+  "id": "chatcmpl-xxx",
+  "object": "chat.completion",
+  "model": "gpt-4o",
+  "choices": [{
+    "index": 0,
+    "message": {
+      "role": "assistant",
+      "content": "量子计算是一种利用量子力学原理..."
+    },
+    "finish_reason": "stop"
+  }],
+  "usage": {
+    "prompt_tokens": 25,
+    "completion_tokens": 150,
+    "total_tokens": 175
+  }
+}</code></pre>
+
+  <h2 id="chat-stream">流式输出（SSE）</h2>
+  <p>设置 <code>"stream": true</code> 即可启用流式输出：</p>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "讲一个笑话"}],
+    "stream": true
+  }'</code></pre>
+
+  <h2 id="chat-vision">聊天识图（Vision）</h2>
+  <p>支持 GPT-4o、GPT-4o-mini 等视觉模型。通过 <code>image_url</code> 传入图片：</p>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{
+      "role": "user",
+      "content": [
+        {"type": "text", "text": "描述这张图片"},
+        {"type": "image_url", "image_url": {"url": "https://example.com/image.jpg"}}
+      ]
+    }]
+  }'</code></pre>
+
+  <p>也支持 base64 格式：</p>
+  <pre><code class="language-json">{"type": "image_url", "image_url": {"url": "data:image/jpeg;base64,/9j/4AAQ..."}}</code></pre>
+
+  <h2 id="chat-function">函数调用（Function Calling）</h2>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "北京今天天气怎么样？"}],
+    "tools": [{
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "description": "获取指定城市的天气",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "city": {"type": "string", "description": "城市名"}
+          },
+          "required": ["city"]
+        }
+      }
+    }]
+  }'</code></pre>
+
+  <h2 id="chat-structured">结构化输出（JSON Mode）</h2>
+  <p>使用 <code>response_format</code> 强制返回 JSON：</p>
+  <pre><code class="language-json">{
+  "model": "gpt-4o",
+  "messages": [{"role": "user", "content": "列出三个编程语言及其特点"}],
+  "response_format": {"type": "json_object"}
+}</code></pre>
+
+  <p>或使用 JSON Schema 精确控制输出格式：</p>
+  <pre><code class="language-json">{
+  "model": "gpt-4o",
+  "messages": [{"role": "user", "content": "提取信息"}],
+  "response_format": {
+    "type": "json_schema",
+    "json_schema": {
+      "name": "person_info",
+      "strict": true,
+      "schema": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "age": {"type": "integer"}
+        },
+        "required": ["name", "age"]
+      }
+    }
+  }
+}</code></pre>
+
+  <h2 id="chat-reasoning">控制推理努力程度</h2>
+  <p>对于 o1/o3/gpt-5 等推理模型，可以通过 <code>reasoning_effort</code> 控制思考深度：</p>
+  <pre><code class="language-json">{
+  "model": "o3",
+  "messages": [{"role": "user", "content": "证明根号2是无理数"}],
+  "reasoning_effort": "high"
+}</code></pre>
+  <p>可选值：<code>low</code>（快速）、<code>medium</code>（默认）、<code>high</code>（深度思考）。</p>
+
+  <h2 id="chat-models">列出可用模型</h2>
+  <div class="endpoint"><span class="method get">GET</span> <code>/v1/models</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/models \
+  -H "Authorization: Bearer sk-你的KEY"</code></pre>
+
+  <h2>常用模型列表</h2>
+  <table class="info-table">
+    <tr><th>模型</th><th>类型</th><th>说明</th></tr>
+    <tr><td><code>gpt-4o</code></td><td>对话/视觉</td><td>GPT-4o 最新版</td></tr>
+    <tr><td><code>gpt-4o-mini</code></td><td>对话/视觉</td><td>轻量快速版</td></tr>
+    <tr><td><code>o3</code></td><td>推理</td><td>深度推理模型</td></tr>
+    <tr><td><code>o4-mini</code></td><td>推理</td><td>快速推理模型</td></tr>
+    <tr><td><code>gpt-5</code></td><td>对话/推理</td><td>GPT-5</td></tr>
+    <tr><td><code>claude-sonnet-4-6</code></td><td>对话</td><td>Claude Sonnet 4.6</td></tr>
+    <tr><td><code>gemini-2.5-pro</code></td><td>对话/视觉</td><td>Gemini 2.5 Pro</td></tr>
+    <tr><td><code>deepseek-v3</code></td><td>对话</td><td>DeepSeek V3</td></tr>
+    <tr><td><code>dall-e-3</code></td><td>绘图</td><td>DALL·E 3</td></tr>
+  </table>
+  <p>完整模型列表请查看 <a href="../pricing.html">价格页面</a>。</p>
+</section>
+
+<!-- ==================== Claude API ==================== -->
+<section id="chat-claude" data-title="Claude API">
+  <h1>Anthropic Claude API</h1>
+  <p>Keys2API 同时支持 Claude 的原生 API 格式和 OpenAI 兼容格式。</p>
+
+  <h2 id="claude-native">原生格式（推荐 Claude 用户使用）</h2>
+  <div class="endpoint"><span class="method post">POST</span> <code>/v1/messages</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: sk-你的KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-6-20250514",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "你好，介绍一下你自己"}]
+  }'</code></pre>
+
+  <h3>流式输出</h3>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: sk-你的KEY" \
+  -H "anthropic-version: 2023-06-01" \
+  -d '{
+    "model": "claude-sonnet-4-6-20250514",
+    "max_tokens": 1024,
+    "stream": true,
+    "messages": [{"role": "user", "content": "写一首关于春天的诗"}]
+  }'</code></pre>
+
+  <h3>扩展思考（Thinking）</h3>
+  <pre><code class="language-json">{
+  "model": "claude-opus-4-6-20250514",
+  "max_tokens": 16000,
+  "thinking": {
+    "type": "enabled",
+    "budget_tokens": 10000
+  },
+  "messages": [{"role": "user", "content": "分析这个复杂问题的解决方案"}]
+}</code></pre>
+
+  <h3>视觉理解（图片识别）</h3>
+  <pre><code class="language-json">{
+  "model": "claude-sonnet-4-6-20250514",
+  "max_tokens": 1024,
+  "messages": [{
+    "role": "user",
+    "content": [
+      {"type": "text", "text": "描述这张图片"},
+      {"type": "image", "source": {"type": "url", "url": "https://example.com/image.jpg"}}
+    ]
+  }]
+}</code></pre>
+
+  <h3>PDF 支持</h3>
+  <pre><code class="language-json">{
+  "model": "claude-sonnet-4-6-20250514",
+  "max_tokens": 1024,
+  "messages": [{
+    "role": "user",
+    "content": [
+      {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": "base64编码的PDF数据"}},
+      {"type": "text", "text": "总结这份文档"}
+    ]
+  }]
+}</code></pre>
+
+  <h2 id="claude-compat">OpenAI 兼容格式</h2>
+  <p>如果你已有 OpenAI SDK 代码，只需更换模型名即可使用 Claude：</p>
+  <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-你的KEY",
+    base_url="https://keys2api.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="claude-sonnet-4-6-20250514",
+    messages=[{"role": "user", "content": "你好！"}]
+)
+print(response.choices[0].message.content)</code></pre>
+
+  <div class="info-tip">
+    <strong>Claude 模型名称</strong>
+    <p>在 OpenAI 兼容模式下使用 <code>claude-sonnet-4-6</code> 或 <code>claude-opus-4-6</code> 即可。</p>
+  </div>
+</section>
+
+<!-- ==================== Gemini API ==================== -->
+<section id="chat-gemini" data-title="Gemini API">
+  <h1>Google Gemini API</h1>
+  <p>Keys2API 支持 Gemini 原生 API 格式和 OpenAI 兼容格式。</p>
+
+  <h2 id="gemini-native">原生格式</h2>
+  <div class="endpoint"><span class="method post">POST</span> <code>/v1beta/models/{model}:generateContent</code></div>
+  <pre><code class="language-bash">curl "https://keys2api.com/v1beta/models/gemini-2.5-pro:generateContent" \
+  -H "Content-Type: application/json" \
+  -H "x-goog-api-key: sk-你的KEY" \
+  -d '{
+    "contents": [{
+      "parts": [{"text": "你好，介绍一下你自己"}]
+    }]
+  }'</code></pre>
+
+  <h3>流式输出</h3>
+  <div class="endpoint"><span class="method post">POST</span> <code>/v1beta/models/{model}:streamGenerateContent</code></div>
+  <pre><code class="language-bash">curl "https://keys2api.com/v1beta/models/gemini-2.5-pro:streamGenerateContent" \
+  -H "Content-Type: application/json" \
+  -H "x-goog-api-key: sk-你的KEY" \
+  -d '{
+    "contents": [{"parts": [{"text": "讲一个故事"}]}]
+  }'</code></pre>
+
+  <h3>图片理解</h3>
+  <pre><code class="language-json">{
+  "contents": [{
+    "parts": [
+      {"text": "描述这张图片"},
+      {"inline_data": {"mime_type": "image/jpeg", "data": "base64编码的图片"}}
+    ]
+  }]
+}</code></pre>
+
+  <h2 id="gemini-compat">OpenAI 兼容格式（推荐）</h2>
+  <p>直接使用 OpenAI SDK，模型名换成 Gemini 即可：</p>
+  <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-你的KEY",
+    base_url="https://keys2api.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="gemini-2.5-pro",
+    messages=[{"role": "user", "content": "你好！"}]
+)
+print(response.choices[0].message.content)</code></pre>
+</section>
+
+<!-- ==================== 图像生成 ==================== -->
+<section id="images" data-title="图像生成">
+  <h1>图像生成 API</h1>
+  <p>支持 DALL·E 3 和 GPT Image 等图像生成模型。</p>
+
+  <h2 id="images-dalle">DALL·E 3 文生图</h2>
+  <div class="endpoint"><span class="method post">POST</span> <code>/v1/images/generations</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "dall-e-3",
+    "prompt": "一只穿着宇航服的猫在月球上",
+    "n": 1,
+    "size": "1024x1024",
+    "quality": "standard"
+  }'</code></pre>
+  <p>可选尺寸：<code>1024x1024</code>（方形）、<code>1792x1024</code>（横向）、<code>1024x1792</code>（纵向）</p>
+  <p>可选质量：<code>standard</code>（标准）、<code>hd</code>（高清）</p>
+
+  <h2 id="images-gpt">GPT Image（gpt-image-1）</h2>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/images/generations \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "gpt-image-1",
+    "prompt": "一张赛博朋克风格的城市夜景",
+    "size": "1024x1024",
+    "quality": "high"
+  }'</code></pre>
+
+  <h3>图片编辑</h3>
+  <div class="endpoint"><span class="method post">POST</span> <code>/v1/images/edits</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/images/edits \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -F model="gpt-image-1" \
+  -F image="@原图.png" \
+  -F prompt="把背景换成海滩"</code></pre>
+
+  <h2>Python 示例</h2>
+  <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(api_key="sk-你的KEY", base_url="https://keys2api.com/v1")
+
+response = client.images.generate(
+    model="dall-e-3",
+    prompt="一只穿着宇航服的猫",
+    size="1024x1024",
+    quality="hd",
+    n=1,
+)
+print(response.data[0].url)</code></pre>
+</section>
+
+<!-- ==================== Embeddings ==================== -->
+<section id="embeddings" data-title="Embeddings">
+  <h1>文本嵌入（Embeddings）</h1>
+  <p>将文本转换为向量表示，用于搜索、分类、聚类等场景。</p>
+
+  <div class="endpoint"><span class="method post">POST</span> <code>/v1/embeddings</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/v1/embeddings \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-你的KEY" \
+  -d '{
+    "model": "text-embedding-3-small",
+    "input": "机器学习是人工智能的一个分支"
+  }'</code></pre>
+
+  <p>响应示例：</p>
+  <pre><code class="language-json">{
+  "object": "list",
+  "data": [{
+    "object": "embedding",
+    "index": 0,
+    "embedding": [0.0023, -0.0091, 0.0152, ...]
+  }],
+  "model": "text-embedding-3-small",
+  "usage": {"prompt_tokens": 12, "total_tokens": 12}
+}</code></pre>
+
+  <h2>可用嵌入模型</h2>
+  <table class="info-table">
+    <tr><th>模型</th><th>维度</th><th>说明</th></tr>
+    <tr><td><code>text-embedding-3-small</code></td><td>1536</td><td>轻量高效</td></tr>
+    <tr><td><code>text-embedding-3-large</code></td><td>3072</td><td>高精度</td></tr>
+    <tr><td><code>text-embedding-ada-002</code></td><td>1536</td><td>经典模型</td></tr>
+  </table>
+</section>
+
+<!-- ==================== 系统 API ==================== -->
+<section id="system-api" data-title="系统 API">
+  <h1>系统 API</h1>
+  <p>通过系统 API 管理你的密钥和账号信息。所有请求需要管理员权限的 token。</p>
+
+  <h2>获取密钥列表</h2>
+  <div class="endpoint"><span class="method get">GET</span> <code>/api/token/</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/api/token/ \
+  -H "Authorization: Bearer sk-管理员KEY"</code></pre>
+
+  <h2>新增密钥</h2>
+  <div class="endpoint"><span class="method post">POST</span> <code>/api/token/</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/api/token/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-管理员KEY" \
+  -d '{
+    "name": "我的密钥",
+    "remain_quota": 5000000,
+    "expired_time": -1,
+    "unlimited_quota": false,
+    "model_limits_enabled": false
+  }'</code></pre>
+
+  <h2>获取账号信息</h2>
+  <div class="endpoint"><span class="method get">GET</span> <code>/api/user/self</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/api/user/self \
+  -H "Authorization: Bearer sk-管理员KEY"</code></pre>
+
+  <h2>修改密钥</h2>
+  <div class="endpoint"><span class="method put">PUT</span> <code>/api/token/</code></div>
+  <pre><code class="language-bash">curl https://keys2api.com/api/token/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer sk-管理员KEY" \
+  -d '{
+    "id": 1,
+    "name": "新名称",
+    "remain_quota": 10000000
+  }'</code></pre>
+
+  <h2>删除密钥</h2>
+  <div class="endpoint"><span class="method delete">DELETE</span> <code>/api/token/{id}</code></div>
+  <pre><code class="language-bash">curl -X DELETE https://keys2api.com/api/token/1 \
+  -H "Authorization: Bearer sk-管理员KEY"</code></pre>
+</section>
+
+<!-- ==================== Python 示例 ==================== -->
+<section id="python" data-title="Python 示例">
+  <h1>Python 示例</h1>
+
+  <h2 id="py-install">安装 SDK</h2>
+  <pre><code class="language-bash">pip install openai</code></pre>
+
+  <h2 id="py-basic">基础对话</h2>
+  <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(
+    api_key="sk-你的KEY",
+    base_url="https://keys2api.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "system", "content": "你是一个有帮助的助手。"},
+        {"role": "user", "content": "用Python写一个冒泡排序"}
+    ]
+)
+print(response.choices[0].message.content)</code></pre>
+
+  <h2 id="py-stream">流式输出</h2>
+  <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(api_key="sk-你的KEY", base_url="https://keys2api.com/v1")
+
+stream = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "讲一个长故事"}],
+    stream=True,
+)
+
+for chunk in stream:
+    if chunk.choices[0].delta.content:
+        print(chunk.choices[0].delta.content, end="", flush=True)</code></pre>
+
+  <h2 id="py-vision">图片识别（本地图片）</h2>
+  <pre><code class="language-python">import base64
+from openai import OpenAI
+
+client = OpenAI(api_key="sk-你的KEY", base_url="https://keys2api.com/v1")
+
+with open("image.jpg", "rb") as f:
+    b64 = base64.b64encode(f.read()).decode()
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "这张图片里有什么？"},
+            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{b64}"}}
+        ]
+    }]
+)
+print(response.choices[0].message.content)</code></pre>
+
+  <h2 id="py-function">Function Calling 完整示例</h2>
+  <pre><code class="language-python">import json
+from openai import OpenAI
+
+client = OpenAI(api_key="sk-你的KEY", base_url="https://keys2api.com/v1")
+
+tools = [{
+    "type": "function",
+    "function": {
+        "name": "get_weather",
+        "description": "获取指定城市的天气信息",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "city": {"type": "string", "description": "城市名称"}
+            },
+            "required": ["city"]
+        }
+    }
+}]
+
+# 第一步：让模型决定调用哪个函数
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "北京天气怎么样？"}],
+    tools=tools,
+)
+
+tool_call = response.choices[0].message.tool_calls[0]
+args = json.loads(tool_call.function.arguments)
+print(f"模型请求调用 get_weather({args})")
+
+# 第二步：执行函数（模拟）
+def get_weather(city):
+    return {"city": city, "temp": "25°C", "weather": "晴"}
+
+result = get_weather(args["city"])
+
+# 第三步：将结果返回给模型
+response2 = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "user", "content": "北京天气怎么样？"},
+        response.choices[0].message,
+        {"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result, ensure_ascii=False)},
+    ],
+    tools=tools,
+)
+print(response2.choices[0].message.content)</code></pre>
+
+  <h2 id="py-multi">多轮对话</h2>
+  <pre><code class="language-python">from openai import OpenAI
+
+client = OpenAI(api_key="sk-你的KEY", base_url="https://keys2api.com/v1")
+
+messages = [{"role": "system", "content": "你是一个有帮助的助手。"}]
+
+while True:
+    user_input = input("你: ")
+    if user_input.lower() in ["exit", "quit", "退出"]:
+        break
+
+    messages.append({"role": "user", "content": user_input})
+
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=messages,
+    )
+
+    reply = response.choices[0].message.content
+    print(f"AI: {reply}\n")
+    messages.append({"role": "assistant", "content": reply})</code></pre>
+
+  <h2 id="py-langchain">LangChain 配置</h2>
+  <pre><code class="language-python">from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(
+    model="gpt-4o",
+    api_key="sk-你的KEY",
+    base_url="https://keys2api.com/v1",
+)
+
+response = llm.invoke("你好！")
+print(response.content)</code></pre>
+</section>
+
+<!-- ==================== Node.js 示例 ==================== -->
+<section id="nodejs" data-title="Node.js 示例">
+  <h1>Node.js 示例</h1>
+
+  <h2>安装</h2>
+  <pre><code class="language-bash">npm install openai</code></pre>
+
+  <h2>基础对话</h2>
+  <pre><code class="language-javascript">import OpenAI from "openai";
+
+const client = new OpenAI({
+    apiKey: "sk-你的KEY",
+    baseURL: "https://keys2api.com/v1",
+});
+
+async function main() {
+    const response = await client.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: "你好！" }],
+    });
+    console.log(response.choices[0].message.content);
+}
+
+main();</code></pre>
+
+  <h2>流式输出</h2>
+  <pre><code class="language-javascript">import OpenAI from "openai";
+
+const client = new OpenAI({
+    apiKey: "sk-你的KEY",
+    baseURL: "https://keys2api.com/v1",
+});
+
+const stream = await client.chat.completions.create({
+    model: "gpt-4o",
+    messages: [{ role: "user", content: "讲一个故事" }],
+    stream: true,
+});
+
+for await (const chunk of stream) {
+    process.stdout.write(chunk.choices[0]?.delta?.content || "");
+}</code></pre>
+</section>
+
+<!-- ==================== 客户端配置 ==================== -->
+<section id="clients" data-title="客户端配置教程">
+  <h1>客户端配置教程</h1>
+  <p>在各种工具和软件中使用 Keys2API。</p>
+
+  <!-- Cursor -->
+  <h2 id="cursor">Cursor</h2>
+  <ol>
+    <li>打开 Cursor → 设置（Settings）→ 模型（Models）</li>
+    <li>找到「OpenAI API Key」，填入：<code>sk-你的KEY</code></li>
+    <li>找到「Override OpenAI Base URL」，填入：<code>https://keys2api.com/v1</code></li>
+    <li>点击「Verify」验证连接</li>
+    <li>在模型列表中添加你需要的模型名（如 <code>gpt-4o</code>、<code>claude-sonnet-4-6</code>）</li>
+  </ol>
+
+  <!-- Claude Code -->
+  <h2 id="claude-code">Claude Code</h2>
+  <p>设置环境变量：</p>
+  <pre><code class="language-bash"># Linux / macOS
+export ANTHROPIC_BASE_URL=https://keys2api.com
+export ANTHROPIC_API_KEY=sk-你的KEY
+
+# Windows PowerShell
+$env:ANTHROPIC_BASE_URL="https://keys2api.com"
+$env:ANTHROPIC_API_KEY="sk-你的KEY"</code></pre>
+  <p>或使用 OpenAI 兼容模式：</p>
+  <pre><code class="language-bash">export OPENAI_BASE_URL=https://keys2api.com/v1
+export OPENAI_API_KEY=sk-你的KEY</code></pre>
+
+  <!-- Cherry Studio -->
+  <h2 id="cherry-studio">Cherry Studio</h2>
+  <ol>
+    <li>打开 Cherry Studio → 设置 → 模型服务</li>
+    <li>选择「OpenAI」或点击添加自定义服务商</li>
+    <li>API Key 填入：<code>sk-你的KEY</code></li>
+    <li>API 地址填入：<code>https://keys2api.com/v1</code></li>
+    <li>在模型列表中添加所需模型名称</li>
+  </ol>
+  <p>配置 Claude 模型：在 Anthropic 服务商中，API 地址填 <code>https://keys2api.com</code>，Key 填你的 Key。</p>
+
+  <!-- ChatBox -->
+  <h2 id="chatbox">ChatBox</h2>
+  <ol>
+    <li>打开 ChatBox → 设置 → 模型</li>
+    <li>选择「OpenAI API」</li>
+    <li>API Host 填入：<code>https://keys2api.com/v1</code></li>
+    <li>API Key 填入：<code>sk-你的KEY</code></li>
+    <li>在模型 (Model) 中填入模型名，如 <code>gpt-4o</code></li>
+  </ol>
+
+  <!-- Cline -->
+  <h2 id="cline">Cline (VS Code)</h2>
+  <ol>
+    <li>在 VS Code 中安装 Cline 扩展</li>
+    <li>打开 Cline 设置 → API Provider 选择「OpenAI Compatible」</li>
+    <li>Base URL 填入：<code>https://keys2api.com/v1</code></li>
+    <li>API Key 填入：<code>sk-你的KEY</code></li>
+    <li>Model 填入：<code>claude-sonnet-4-6</code> 或其他模型名</li>
+  </ol>
+
+  <!-- 沉浸式翻译 -->
+  <h2 id=" immersive-translate">沉浸式翻译</h2>
+  <ol>
+    <li>打开沉浸式翻译设置 → 翻译服务</li>
+    <li>选择「OpenAI」</li>
+    <li>API Key 填入：<code>sk-你的KEY</code></li>
+    <li>API 地址填入：<code>https://keys2api.com/v1</code></li>
+    <li>模型填入：<code>gpt-4o-mini</code>（翻译推荐用 mini 省钱）</li>
+  </ol>
+
+  <!-- NextChat -->
+  <h2 id="nextchat">NextChat</h2>
+  <ol>
+    <li>打开 NextChat → 设置</li>
+    <li>选择「自定义接口」(Custom Endpoint)</li>
+    <li>OpenAI Endpoint 填入：<code>https://keys2api.com/v1</code></li>
+    <li>API Key 填入：<code>sk-你的KEY</code></li>
+    <li>选择或输入模型名</li>
+  </ol>
+
+  <!-- LobeChat -->
+  <h2 id="lobechat">LobeChat</h2>
+  <ol>
+    <li>打开 LobeChat → 设置 → 语言模型</li>
+    <li>选择「OpenAI」</li>
+    <li>API Key 填入：<code>sk-你的KEY</code></li>
+    <li>Proxy 地址填入：<code>https://keys2api.com/v1</code></li>
+    <li>添加所需模型</li>
+  </ol>
+
+  <!-- Dify -->
+  <h2 id="dify">Dify</h2>
+  <ol>
+    <li>在 Dify 中进入「设置」→「模型供应商」</li>
+    <li>选择「OpenAI-API-compatible」类型</li>
+    <li>Model Name 填入：<code>gpt-4o</code></li>
+    <li>API Key 填入：<code>sk-你的KEY</code></li>
+    <li>API endpoint 填入：<code>https://keys2api.com/v1</code></li>
+  </ol>
+
+  <!-- Codex -->
+  <h2 id="codex">Codex CLI</h2>
+  <pre><code class="language-bash">export OPENAI_API_KEY=sk-你的KEY
+export OPENAI_BASE_URL=https://keys2api.com/v1</code></pre>
+</section>
+
+<!-- ==================== 帮助中心 ==================== -->
+<section id="help" data-title="帮助中心">
+  <h1>帮助中心</h1>
+
+  <h2>HTTP 状态码</h2>
+  <table class="info-table">
+    <tr><th>状态码</th><th>含义</th><th>说明</th></tr>
+    <tr><td><code>200</code></td><td>成功</td><td>请求正常返回</td></tr>
+    <tr><td><code>400</code></td><td>请求错误</td><td>参数格式不正确，检查请求体</td></tr>
+    <tr><td><code>401</code></td><td>未授权</td><td>API Key 无效或未填写</td></tr>
+    <tr><td><code>403</code></td><td>禁止访问</td><td>密钥无权限访问该模型或分组</td></tr>
+    <tr><td><code>429</code></td><td>请求过多</td><td>超出速率限制（QPS），请降低频率</td></tr>
+    <tr><td><code>500</code></td><td>服务器错误</td><td>上游服务异常，请重试</td></tr>
+    <tr><td><code>502</code></td><td>网关错误</td><td>上游服务不可用</td></tr>
+    <tr><td><code>503</code></td><td>服务不可用</td><td>服务暂时不可用，请稍后重试</td></tr>
+  </table>
+
+  <h2>常见错误</h2>
+
+  <h3>额度不足</h3>
+  <pre><code class="language-json">{
+  "error": {
+    "message": "当前分组额度已耗尽",
+    "code": "insufficient_quota"
+  }
+}</code></pre>
+  <p>解决：在控制台充值或更换有余额的密钥。</p>
+
+  <h3>模型不存在</h3>
+  <pre><code class="language-json">{
+  "error": {
+    "message": "该分组不支持该模型",
+    "code": "model_not_found"
+  }
+}</code></pre>
+  <p>解决：检查模型名是否正确，或更换支持该模型的分组。</p>
+
+  <h3>超出速率限制</h3>
+  <pre><code class="language-json">{
+  "error": {
+    "message": "请求过于频繁，请稍后再试",
+    "code": "rate_limit_exceeded"
+  }
+}</code></pre>
+  <p>解决：降低请求频率，或联系客服提升 QPS 限制。</p>
+
+  <h2>思考字段说明</h2>
+  <p>对于支持推理的模型（如 o3、DeepSeek-R1、Claude Thinking），返回结果中可能包含 <code>reasoning_content</code> 字段：</p>
+  <pre><code class="language-json">{
+  "choices": [{
+    "message": {
+      "role": "assistant",
+      "content": "最终答案",
+      "reasoning_content": "让我思考一下... 首先..."
+    }
+  }]
+}</code></pre>
+  <p><code>reasoning_content</code> 是模型的思考过程（链式思维），不计入输出 token 费用（部分模型除外，请参考价格页面）。</p>
+</section>
+
+<!-- ==================== 免责声明 ==================== -->
+<section id="disclaimer" data-title="免责声明">
+  <h1>免责声明</h1>
+  <div class="info-tip">
+    <p>本站API仅用于学习、研究和体验目的，请自觉遵守相关法律法规，切勿用于非法用途。使用本站服务即表示您同意自行承担所有相关风险和责任。本站不承担任何法律责任。</p>
+  </div>
+</section>
+
+<!-- ==================== 联系客服 ==================== -->
+<section id="contact" data-title="联系客服">
+  <h1>联系客服</h1>
+  <p>在使用过程中遇到任何问题（如充值、模型接入、报错排查、发票等），欢迎随时联系客服：</p>
+  <div class="contact-card">
+    <p>点击网站页面<strong>右下角的客服图标</strong>，即可打开在线客服对话。</p>
+    <p><strong>邮箱</strong>：key2api@163.com</p>
+  </div>
+</section>
+
+  </div><!-- /content -->
+
+  <!-- Back to top -->
+  <button class="to-top" id="toTop" title="回到顶部">↑</button>
+</main>
+
+<script src="main.js"></script>
 </body>
 </html>

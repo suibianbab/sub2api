@@ -357,15 +357,21 @@ async function loadData() {
     // Restore saved selection or fallback to first available
     const saved = loadSavedSelection()
 
-    // Validate saved group
+    // Find the first group that the user actually has keys in
+    const firstGroupWithKeys = groups.value.find((g) =>
+      activeKeys.value.some((k) => k.group_id === g.id)
+    )
+
+    // Validate saved group — must have keys in it
     if (
       saved.groupId != null &&
-      groups.value.some((g) => g.id === saved.groupId)
+      groups.value.some((g) => g.id === saved.groupId) &&
+      activeKeys.value.some((k) => k.group_id === saved.groupId)
     ) {
       selectedGroupId.value = saved.groupId
     } else {
-      // Default to first group
-      selectedGroupId.value = groups.value[0]?.id ?? null
+      // Default to first group that has keys
+      selectedGroupId.value = firstGroupWithKeys?.id ?? null
     }
 
     // Validate saved key within selected group

@@ -389,6 +389,7 @@ export default {
     channelStatus: 'Channel Status',
     riskControl: 'Risk Control',
     imagePlayground: 'Image Playground',
+    pricing: 'Model Pricing',
   },
 
   // Auth
@@ -2313,6 +2314,17 @@ export default {
         unitPerRequest: '/ request'
       }
     },
+
+  pricing: {
+    title: 'Model Pricing',
+    description: 'Official USD model prices per 1M tokens',
+    searchPlaceholder: 'Search models...',
+    allPlatforms: 'All',
+    empty: 'No models found',
+    input: 'Input',
+    output: 'Output',
+    totalModels: '{count} models',
+  },
 
     // Channel Management
     channels: {

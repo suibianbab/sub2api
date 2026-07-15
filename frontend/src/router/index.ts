@@ -253,6 +253,18 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/pricing',
+    name: 'Pricing',
+    component: () => import('@/views/user/PricingView.vue'),
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: false,
+      title: 'Model Pricing',
+      titleKey: 'pricing.title',
+      descriptionKey: 'pricing.description'
+    }
+  },
+  {
     path: '/image-playground',
     name: 'ImagePlayground',
     component: () => import('@/views/user/ImagePlaygroundView.vue'),
