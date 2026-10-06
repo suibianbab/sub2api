@@ -62,7 +62,7 @@
           <button
             type="button"
             class="btn btn-primary shrink-0"
-            :disabled="!selectedUser || newRpm == null || newRpm < 0"
+            :disabled="!selectedUser || newRpm == null || !Number.isInteger(newRpm) || newRpm < 0"
             @click="handleAddLocal"
           >
             {{ t('common.add') }}
@@ -102,8 +102,8 @@
 
         <div v-else>
           <div class="overflow-hidden rounded-lg border border-gray-200 dark:border-dark-600">
-            <div class="max-h-[420px] overflow-y-auto">
-              <table class="w-full text-sm">
+            <div class="max-h-[420px] overflow-auto">
+              <table class="w-full min-w-max text-sm">
                 <thead class="sticky top-0 z-[1]">
                   <tr class="border-b border-gray-200 bg-gray-50 dark:border-dark-600 dark:bg-dark-700">
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">{{ t('admin.groups.columns.userEmail') }}</th>
@@ -206,7 +206,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { adminAPI } from '@/api/admin'
@@ -333,7 +333,7 @@ const selectUser = (user: AdminUser) => {
 }
 
 const handleAddLocal = () => {
-  if (!selectedUser.value || newRpm.value == null || newRpm.value < 0) return
+  if (!selectedUser.value || newRpm.value == null || !Number.isInteger(newRpm.value) || newRpm.value < 0) return
   const user = selectedUser.value
   const idx = localEntries.value.findIndex(e => e.user_id === user.id)
   const entry: LocalEntry = {
@@ -420,6 +420,10 @@ const handleClickOutside = () => { showDropdown.value = false }
 if (typeof document !== 'undefined') {
   document.addEventListener('click', handleClickOutside)
 }
+onUnmounted(() => {
+  clearTimeout(searchTimeout)
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>

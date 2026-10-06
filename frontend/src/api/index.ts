@@ -1,5 +1,5 @@
 /**
- * API Client for Sub2API Backend
+ * API Client for Key2API Backend
  * Central export point for all API modules
  */
 
@@ -19,6 +19,7 @@ export { userGroupsAPI } from './groups'
 export { userChannelsAPI } from './channels'
 export * as batchImageAPI from './batchImage'
 export { totpAPI } from './totp'
+export { passkeyAPI, type PasskeyCredentialSummary } from './passkey'
 export { default as announcementsAPI } from './announcements'
 export { channelMonitorUserAPI } from './channelMonitor'
 

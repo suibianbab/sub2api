@@ -1,18 +1,30 @@
+import { openAIPlanTypeLabel } from '@/utils/planType'
 import { describe, it, expect } from 'vitest'
 import {
   ANTIGRAVITY_PROJECT_ID_CREDENTIAL_KEY,
   HEADER_OVERRIDE_ENABLED_CREDENTIAL_KEY,
   HEADER_OVERRIDES_CREDENTIAL_KEY,
+  OPENCODE_GO_PROTOCOL_RULES_KEY,
   applyAntigravityProjectID,
   applyHeaderOverride,
   applyInterceptWarmup,
+  applyOpenCodeGoProtocolRules,
   applyPlanType,
   buildHeaderOverridesObject,
   buildPlanTypeOptions,
-  getHeaderOverrideTemplate,
-  isHeaderOverridePlatform,
+  cloneOpenCodeGoProtocolRules,
+  cnQuotaCellVisible,
+  defaultCNBaseUrl,
+  defaultOpenCodeProtocolRules,
+  isCustomGrokBaseUrl,
+  resolveOpenCodeAccountMode,
+  isHeaderOverrideCapable,
+  GROK_BASE_URL_PRESETS,
+  parseHeaderOverridesJson,
+  parseOpenCodeGoProtocolRules,
   planTypeDisplayLabel,
   readPlanType,
+  serializeHeaderOverrideRows,
   splitHeaderOverridesObject,
   validateHeaderOverrideRows
 } from '../credentialsBuilder'
@@ -95,14 +107,179 @@ describe('applyAntigravityProjectID', () => {
   })
 })
 
-describe('isHeaderOverridePlatform', () => {
-  it('only anthropic and openai are supported', () => {
-    expect(isHeaderOverridePlatform('anthropic')).toBe(true)
-    expect(isHeaderOverridePlatform('openai')).toBe(true)
-    expect(isHeaderOverridePlatform('gemini')).toBe(false)
-    expect(isHeaderOverridePlatform('grok')).toBe(false)
-    expect(isHeaderOverridePlatform('antigravity')).toBe(false)
-    expect(isHeaderOverridePlatform('')).toBe(false)
+describe('openCodeGo protocol rules', () => {
+  it('resolves missing OpenCode account_mode as GO and zen as Zen', () => {
+    expect(resolveOpenCodeAccountMode(undefined)).toBe('go')
+    expect(resolveOpenCodeAccountMode('coding')).toBe('go')
+    expect(resolveOpenCodeAccountMode('zen')).toBe('zen')
+    expect(resolveOpenCodeAccountMode('go')).toBe('go')
+  })
+
+  it('uses Zen vs GO default endpoints and protocol rules', () => {
+    expect(defaultCNBaseUrl('opencode_go', 'zen', 'adaptive')).toBe('https://opencode.ai/zen/v1')
+    expect(defaultCNBaseUrl('opencode_go', 'zen', 'anthropic')).toBe('https://opencode.ai/zen')
+    expect(defaultCNBaseUrl('opencode_go', 'go', 'adaptive')).toBe('https://opencode.ai/zen/go/v1')
+    expect(defaultCNBaseUrl('opencode_go', 'go', 'anthropic')).toBe('https://opencode.ai/zen/go')
+    expect(defaultOpenCodeProtocolRules('zen').some(rule => rule.pattern === 'claude-*')).toBe(true)
+    expect(defaultOpenCodeProtocolRules('go').some(rule => rule.pattern === 'minimax-*')).toBe(true)
+    expect(cnQuotaCellVisible('opencode_go', 'zen')).toBe(false)
+    expect(cnQuotaCellVisible('opencode_go', 'go')).toBe(true)
+    expect(cnQuotaCellVisible('opencode_go', '')).toBe(true)
+  })
+
+  it('parses stored rules and skips invalid entries', () => {
+    expect(parseOpenCodeGoProtocolRules(null)).toBeNull()
+    expect(parseOpenCodeGoProtocolRules([])).toEqual([])
+    expect(
+      parseOpenCodeGoProtocolRules([
+        { pattern: 'grok-*', protocol: 'responses' },
+        { pattern: '', protocol: 'anthropic' },
+        { pattern: 'qwen*', protocol: 'adaptive' },
+        { pattern: 'minimax-*', protocol: 'anthropic' }
+      ])
+    ).toEqual([
+      { pattern: 'grok-*', protocol: 'responses' },
+      { pattern: 'minimax-*', protocol: 'anthropic' }
+    ])
+  })
+
+  it('writes lowercase patterns on create and keeps an empty list on edit', () => {
+    const created: Record<string, unknown> = {}
+    applyOpenCodeGoProtocolRules(created, cloneOpenCodeGoProtocolRules(), 'create')
+    expect(created[OPENCODE_GO_PROTOCOL_RULES_KEY]).toEqual(cloneOpenCodeGoProtocolRules())
+
+    const edited: Record<string, unknown> = { api_key: 'sk' }
+    applyOpenCodeGoProtocolRules(edited, [], 'edit')
+    expect(edited[OPENCODE_GO_PROTOCOL_RULES_KEY]).toEqual([])
+  })
+})
+
+describe('isHeaderOverrideCapable', () => {
+  it('anthropic/openai only support apikey accounts', () => {
+    expect(isHeaderOverrideCapable('anthropic', 'apikey')).toBe(true)
+    expect(isHeaderOverrideCapable('openai', 'apikey')).toBe(true)
+    expect(isHeaderOverrideCapable('anthropic', 'oauth')).toBe(false)
+    expect(isHeaderOverrideCapable('openai', 'oauth')).toBe(false)
+  })
+
+  it('kimi/zhipu/deepseek only support apikey accounts', () => {
+    for (const platform of ['kimi', 'zhipu', 'deepseek', 'minimax', 'opencode_go']) {
+      expect(isHeaderOverrideCapable(platform, 'apikey')).toBe(true)
+      expect(isHeaderOverrideCapable(platform, 'oauth')).toBe(false)
+    }
+  })
+
+  it('grok supports both apikey and oauth accounts', () => {
+    expect(isHeaderOverrideCapable('grok', 'apikey')).toBe(true)
+    expect(isHeaderOverrideCapable('grok', 'oauth')).toBe(true)
+    expect(isHeaderOverrideCapable('grok', 'bedrock')).toBe(false)
+  })
+
+  it('other platforms are not supported', () => {
+    expect(isHeaderOverrideCapable('gemini', 'apikey')).toBe(false)
+    expect(isHeaderOverrideCapable('antigravity', 'apikey')).toBe(false)
+    expect(isHeaderOverrideCapable('', 'apikey')).toBe(false)
+  })
+})
+
+describe('parseHeaderOverridesJson', () => {
+  it('parses a flat object and normalizes values to trimmed strings', () => {
+    expect(
+      parseHeaderOverridesJson('{"User-Agent": " my-client/1.0 ", "x-num": 3, "x-flag": true}')
+    ).toEqual([
+      { name: 'User-Agent', value: 'my-client/1.0' },
+      { name: 'x-flag', value: 'true' },
+      { name: 'x-num', value: '3' }
+    ])
+  })
+
+  it('drops entries with blank names', () => {
+    expect(parseHeaderOverridesJson('{"  ": "v", "x-app": "cli"}')).toEqual([
+      { name: 'x-app', value: 'cli' }
+    ])
+  })
+
+  it('rejects invalid JSON, arrays, primitives and nested values', () => {
+    expect(parseHeaderOverridesJson('not json')).toBeNull()
+    expect(parseHeaderOverridesJson('[1,2]')).toBeNull()
+    expect(parseHeaderOverridesJson('"str"')).toBeNull()
+    expect(parseHeaderOverridesJson('null')).toBeNull()
+    expect(parseHeaderOverridesJson('{"a": {"b": 1}}')).toBeNull()
+    expect(parseHeaderOverridesJson('{"a": null}')).toBeNull()
+  })
+
+  it('parses an empty object to an empty row list', () => {
+    expect(parseHeaderOverridesJson('{}')).toEqual([])
+  })
+})
+
+describe('serializeHeaderOverrideRows', () => {
+  it('serializes named rows and skips empty placeholder rows', () => {
+    const text = serializeHeaderOverrideRows([
+      { name: ' user-agent ', value: ' my-client/1.0 ' },
+      { name: '', value: 'ignored' },
+      { name: 'x-app', value: '' }
+    ])
+    expect(JSON.parse(text)).toEqual({ 'user-agent': 'my-client/1.0', 'x-app': '' })
+  })
+
+  it('round-trips with parseHeaderOverridesJson', () => {
+    const rows = [
+      { name: 'a-header', value: '1' },
+      { name: 'b-header', value: '2' }
+    ]
+    expect(parseHeaderOverridesJson(serializeHeaderOverrideRows(rows))).toEqual(rows)
+  })
+})
+
+describe('isCustomGrokBaseUrl', () => {
+  it('treats only the default CLI gateway host as not customized', () => {
+    expect(isCustomGrokBaseUrl('https://cli-chat-proxy.grok.com/v1')).toBe(false)
+    expect(isCustomGrokBaseUrl('HTTPS://CLI-CHAT-PROXY.GROK.COM:443/')).toBe(false)
+  })
+
+  it('treats manually switched official/regional endpoints as customized (must echo back)', () => {
+    expect(isCustomGrokBaseUrl('https://api.x.ai/v1')).toBe(true)
+    expect(isCustomGrokBaseUrl('https://us-west-2.api.x.ai/v1')).toBe(true)
+    expect(isCustomGrokBaseUrl('https://eu-west-1.api.x.ai/v1')).toBe(true)
+  })
+
+  it('treats empty, non-string and unparseable values as not customized', () => {
+    expect(isCustomGrokBaseUrl('')).toBe(false)
+    expect(isCustomGrokBaseUrl('   ')).toBe(false)
+    expect(isCustomGrokBaseUrl(undefined)).toBe(false)
+    expect(isCustomGrokBaseUrl(42)).toBe(false)
+    expect(isCustomGrokBaseUrl('not a url')).toBe(false)
+  })
+
+  it('treats third-party hosts as customized', () => {
+    expect(isCustomGrokBaseUrl('https://relay.example.com/v1')).toBe(true)
+    expect(isCustomGrokBaseUrl('https://relay.example.com/xai/v1')).toBe(true)
+    expect(isCustomGrokBaseUrl('http://relay.example.com/v1')).toBe(true)
+  })
+})
+
+describe('GROK_BASE_URL_PRESETS', () => {
+  it('covers the CLI gateway, official API and regional endpoints', () => {
+    const urls = GROK_BASE_URL_PRESETS.map((p) => p.url)
+    expect(urls).toEqual([
+      'https://cli-chat-proxy.grok.com/v1',
+      'https://api.x.ai/v1',
+      'https://us-east-1.api.x.ai/v1',
+      'https://us-west-2.api.x.ai/v1',
+      'https://eu-west-1.api.x.ai/v1'
+    ])
+    for (const preset of GROK_BASE_URL_PRESETS) {
+      // 每个预设要么有 i18n 标签键，要么有区域标识等字面标签
+      expect(Boolean(preset.labelKey) || Boolean(preset.label)).toBe(true)
+      if (preset.labelKey) {
+        expect(['cli', 'official']).toContain(preset.labelKey)
+      }
+    }
+    // 区域端点用区域标识作字面标签（us-east-1 这样的专有名词不做 i18n）
+    expect(GROK_BASE_URL_PRESETS[2].label).toBe('us-east-1')
+    expect(GROK_BASE_URL_PRESETS[3].label).toBe('us-west-2')
+    expect(GROK_BASE_URL_PRESETS[4].label).toBe('eu-west-1')
   })
 })
 
@@ -176,29 +353,6 @@ describe('buildHeaderOverridesObject / splitHeaderOverridesObject', () => {
       { name: 'x-app', value: 'cli' }
     ]
     expect(splitHeaderOverridesObject(buildHeaderOverridesObject(rows))).toEqual(rows)
-  })
-})
-
-describe('getHeaderOverrideTemplate', () => {
-  it('returns Claude Code CLI headers with empty values for anthropic', () => {
-    const rows = getHeaderOverrideTemplate('anthropic')
-    expect(rows.every((r) => r.value === '')).toBe(true)
-    const names = rows.map((r) => r.name)
-    expect(names).toContain('user-agent')
-    expect(names).toContain('x-app')
-    expect(names).toContain('anthropic-beta')
-    expect(names).toContain('x-stainless-lang')
-    expect(validateHeaderOverrideRows(rows)).toBeNull()
-  })
-
-  it('returns Codex CLI headers with empty values for openai', () => {
-    const rows = getHeaderOverrideTemplate('openai')
-    expect(rows.every((r) => r.value === '')).toBe(true)
-    const names = rows.map((r) => r.name)
-    expect(names).toContain('user-agent')
-    expect(names).toContain('originator')
-    expect(names).toContain('openai-beta')
-    expect(validateHeaderOverrideRows(rows)).toBeNull()
   })
 })
 
@@ -298,11 +452,18 @@ describe('plan_type helpers', () => {
   describe('planTypeDisplayLabel', () => {
     it('maps canonical + alias values to friendly labels', () => {
       expect(planTypeDisplayLabel('plus')).toBe('Plus')
-      expect(planTypeDisplayLabel('pro')).toBe('Pro')
-      expect(planTypeDisplayLabel('chatgptpro')).toBe('Pro')
+      expect(planTypeDisplayLabel('pro')).toBe('Pro 200')
+      expect(planTypeDisplayLabel('chatgptpro')).toBe('Pro 200')
+      expect(planTypeDisplayLabel('prolite')).toBe('Pro 100')
       expect(planTypeDisplayLabel('free')).toBe('Free')
-      expect(planTypeDisplayLabel('team')).toBe('Team')
-      expect(planTypeDisplayLabel('CHATGPTPRO')).toBe('Pro')
+      expect(planTypeDisplayLabel('team')).toBe('Business')
+      expect(planTypeDisplayLabel('self_serve_business_prolite')).toBe('Business Premium')
+    })
+    it('normalizes case, separators and surrounding blanks', () => {
+      expect(planTypeDisplayLabel('CHATGPTPRO')).toBe('Pro 200')
+      expect(planTypeDisplayLabel('PROLITE')).toBe('Pro 100')
+      expect(planTypeDisplayLabel('  Pro Lite  ')).toBe('Pro 100')
+      expect(planTypeDisplayLabel('self-serve-business-pro-lite')).toBe('Business Premium')
     })
     it('returns unknown values verbatim', () => {
       expect(planTypeDisplayLabel('self_serve_business')).toBe('self_serve_business')
@@ -323,36 +484,37 @@ describe('plan_type helpers', () => {
   })
 
   describe('buildPlanTypeOptions', () => {
-    const clear = 'Clear'
-    it('returns clear + presets when current is empty', () => {
-      expect(buildPlanTypeOptions('', clear)).toEqual([
-        { value: '', label: clear },
-        { value: 'plus', label: 'Plus' },
-        { value: 'pro', label: 'Pro' },
-        { value: 'free', label: 'Free' }
+    it('includes all current SKUs with their status labels', () => {
+      const opts = buildPlanTypeOptions('', 'Clear')
+      expect(opts[0]).toEqual({ value: '', label: 'Clear' })
+      expect(opts).toContainEqual({ value: 'prolite', label: 'Pro 100' })
+      expect(opts).toContainEqual({ value: 'pro', label: 'Pro 200' })
+      expect(opts).toContainEqual({ value: 'promax', label: 'Pro 500' })
+      expect(opts).toContainEqual({ value: 'edu_plus', label: 'Edu Plus' })
+      expect(opts).toContainEqual({ value: 'edu_pro', label: 'Edu Pro' })
+      expect(opts).toContainEqual({ value: 'enterprise_cbp_automation', label: 'Enterprise (Automation)' })
+    })
+    it('preserves aliases without duplicating the same SKU', () => {
+      for (const [alias, canonical] of [['chatgpt_pro', 'pro'], ['pro_lite', 'prolite'], ['selfservebusinessprolite', 'self_serve_business_prolite']]) {
+        const opts = buildPlanTypeOptions(alias, 'Clear')
+        expect(opts.filter(option => option.value === alias)).toHaveLength(1)
+        expect(opts.some(option => option.value === canonical)).toBe(false)
+      }
+    })
+    it('keeps distinct SKUs that share the Enterprise label', () => {
+      const opts = buildPlanTypeOptions('ent26', 'Clear')
+      expect(opts.filter(option => option.label === 'Enterprise').map(option => option.value)).toEqual([
+        'business', 'enterprise', 'ent26', 'enterprise_cbp_usage_based'
       ])
+      for (const value of ['business', 'enterprise', 'ent26', 'enterprise_cbp_usage_based']) {
+        expect(applyPlanType({}, value)).toEqual({ plan_type: value })
+      }
     })
-    it('keeps canonical chatgptpro under a single friendly "Pro" option (no duplicate)', () => {
-      const opts = buildPlanTypeOptions('chatgptpro', clear)
-      const pros = opts.filter(o => o.label === 'Pro')
-      expect(pros).toHaveLength(1)
-      expect(pros[0].value).toBe('chatgptpro')
-      expect(opts.map(o => o.value)).toEqual(['', 'plus', 'chatgptpro', 'free'])
-    })
-    it('appends an unknown-but-labeled value (team) as its own option', () => {
-      const opts = buildPlanTypeOptions('team', clear)
-      expect(opts.find(o => o.value === 'team')).toEqual({ value: 'team', label: 'Team' })
-      // presets untouched
-      expect(opts.map(o => o.value)).toEqual(['', 'plus', 'pro', 'free', 'team'])
-    })
-    it('appends a fully custom value with a raw label', () => {
-      const opts = buildPlanTypeOptions('weird_x', clear)
-      expect(opts.at(-1)).toEqual({ value: 'weird_x', label: 'weird_x' })
-    })
-    it('does not duplicate an exact preset value', () => {
-      const opts = buildPlanTypeOptions('pro', clear)
-      expect(opts.filter(o => o.value === 'pro')).toHaveLength(1)
-      expect(opts.map(o => o.value)).toEqual(['', 'plus', 'pro', 'free'])
+    it('keeps unknown values and exact presets without duplicates', () => {
+      expect(buildPlanTypeOptions('future_sku', 'Clear').at(-1)).toEqual({ value: 'future_sku', label: 'future_sku' })
+      for (const value of ['promax', 'team', 'ent26', 'edu_plus']) {
+        expect(buildPlanTypeOptions(value, 'Clear').filter(option => option.value === value)).toHaveLength(1)
+      }
     })
   })
 
@@ -378,3 +540,13 @@ describe('plan_type helpers', () => {
   })
 })
 
+describe('Codex subscription analytics labels', () => {
+  it.each([
+    ['business', 'Business'], ['self_serve_business_prolite', 'Business'],
+    ['enterprise_cbp_automation', 'Enterprise'], ['ent26', 'Enterprise'],
+    ['edu', 'Education'], ['edu_plus', 'Education'], ['edu_pro', 'Education'],
+    ['unknown', 'Account'], ['promax', 'Pro 500']
+  ])('groups %s without changing its status label', (sku, label) => {
+    expect(openAIPlanTypeLabel(sku, 'analytics')).toBe(label)
+  })
+})

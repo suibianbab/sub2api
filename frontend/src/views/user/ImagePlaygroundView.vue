@@ -204,13 +204,13 @@ const selectedKeyId = ref<number | null>(null)
 const playgroundUrl = computed(() => {
   const settingsUrl = appStore.cachedPublicSettings?.image_playground_url
   if (settingsUrl) return settingsUrl
-  // Default: assume Playground is deployed alongside Sub2API on port 8081
+  // Default: assume Playground is deployed alongside Key2API on port 8081
   const { protocol, hostname } = window.location
   return `${protocol}//${hostname}:8081`
 })
 
 /**
- * The Sub2API API base URL for the Playground to call.
+ * The Key2API API base URL for the Playground to call.
  * Uses the direct API endpoint (api.keys2api.com) to bypass Cloudflare
  * and avoid timeouts for long-running 2K image generation requests.
  */
